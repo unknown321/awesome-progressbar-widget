@@ -1,3 +1,6 @@
+blingbling = require("blingbling")  -- extra
+
+
 local function show_notif()
             path = run_script()
             naughty.config.presets.normal.icon_size = 180
