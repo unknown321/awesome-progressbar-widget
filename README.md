@@ -4,8 +4,8 @@ An awesome widget (3.4 only). Based on blingbling widgets. Horribly unoptimised,
 
 
 Features:
-* wibox with visual track progress and track name
-* notification with track, artist name, cover etc.
+* Fixed-size progressbar with visual track progress and track name
+* On-click notification with track, artist name, cover etc.
 
 ![progressbar](https://github.com/unknown321/awesome-progressbar-widget/raw/master/progressbar.png)
 
