@@ -169,6 +169,8 @@ def __main__():
 			time.sleep(1)
 			mpd_info_file.write("00:00\nMusic daemon error {0}".format(str(e)))
 			mpd_info_file.seek(0,0)
+			if options.NOTIF:
+				return 0
 		else:
 			progress = compose_progress_info(client)
 			for key, value in progress.iteritems():
@@ -177,6 +179,7 @@ def __main__():
 				notification = compose_notification_info(client)
 				for key, value in notification.iteritems():
 					mpd_info_file.write(value + '\n')
+				return 0
 			mpd_info_file.seek(0,0)
 			time.sleep(3)
 	# parser.add_option("-p", action="callback", callback=compose_progress_info, callback_kwargs={'client':client})
