@@ -10,7 +10,7 @@ from optparse import OptionParser
 import time
 parser = OptionParser()
 
-MUSIC_DIRECTORY = "/media/your_music_directory"
+MUSIC_DIRECTORY = "/media/Files/m/"
 # a template used by naughty to show notifications with cover
 TEMPLATE = """by $artist
 from $album ($year)
@@ -119,7 +119,7 @@ def parse_time(_time):
 	return realtime
 
 
-def print_notification_info(client):
+def compose_notification_info(client):
 	info = get_song_info(client)
 	cover = append_cover(info['filepath'])
 	if 'nocover.png' not in cover:
@@ -135,7 +135,7 @@ def print_notification_info(client):
 
 	return a
 
-def print_progress_info(client):
+def compose_progress_info(client):
 	a = {'time_text':'00:00'}
 	info = get_song_info(client)
 	if info.has_key('status'):
@@ -151,31 +151,36 @@ def print_progress_info(client):
 
 
 def __main__():
-	time.sleep(2)
-	client = connect()
+	retries = 0
 	mpd_info_file = open('/home/unknown/.config/awesome/mpdinfo','w')
-	if not client:
-		print "No connection"
-		return 1
+	mpd_info_file.write("00:00\n ")
+	mpd_info_file.seek(0,0)
+	client = None
+	while not client:
+		client = connect()
+		retries = retries + 1
+		mpd_info_file.write("00:00\nNo connection; {0}".format(str(retries)))
+		mpd_info_file.seek(0,0)
+		time.sleep(1)
 	while True:
 		try:
 			client.ping()
 		except Exception, e:
 			time.sleep(1)
-			print "music daemon error {0}".format(str(e))
+			mpd_info_file.write("00:00\nMusic daemon error {0}".format(str(e)))
+			mpd_info_file.seek(0,0)
 		else:
-			progress = print_progress_info(client)
+			progress = compose_progress_info(client)
 			for key, value in progress.iteritems():
 				mpd_info_file.write(value + '\n')
 			if options.NOTIF:
-				notification = print_notification_info(client)
+				notification = compose_notification_info(client)
 				for key, value in notification.iteritems():
 					mpd_info_file.write(value + '\n')
-				return 0
 			mpd_info_file.seek(0,0)
 			time.sleep(3)
-	# parser.add_option("-p", action="callback", callback=print_progress_info, callback_kwargs={'client':client})
-	# parser.add_option("-t", action="callback", callback=print_notification_info, callback_kwargs={'client':client})
+	# parser.add_option("-p", action="callback", callback=compose_progress_info, callback_kwargs={'client':client})
+	# parser.add_option("-t", action="callback", callback=compose_notification_info, callback_kwargs={'client':client})
 	# (options, args) = parser.parse_args()
 
 NOTIF = False
